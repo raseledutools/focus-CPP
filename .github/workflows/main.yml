@@ -3,7 +3,7 @@ name: Build RasBlocker Pro
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch: # এই লাইনের ফলে আপনি গিটহাব থেকে ম্যানুয়ালিও বিল্ড স্টার্ট করতে পারবেন
+  workflow_dispatch: 
 
 jobs:
   build:
@@ -13,6 +13,10 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
+    - name: Download webview.h (Single Header Version)
+      # এই ধাপটি কম্পাইল করার আগেই সঠিক লাইব্রেরিটি গিটহাবে নামিয়ে নেবে
+      run: curl -L -o webview.h https://raw.githubusercontent.com/webview/webview/0.10.0/webview.h
+
     - name: Setup MinGW (C++ Compiler)
       uses: egor-tensin/setup-gcc@v1
       with:
@@ -20,12 +24,10 @@ jobs:
         platform: x64
 
     - name: Compile C++ Code
-      # -static ফ্ল্যাগগুলো দেওয়া হয়েছে যাতে অন্য পিসিতে কোনো DLL ফাইল মিসিং না দেখায়
       run: |
         g++ main.cpp -o RasBlockerPro.exe -static -static-libgcc -static-libstdc++ -mwindows -ladvapi32 -lole32 -lshell32 -lshlwapi -luser32 -lversion -loleaut32
 
     - name: Package App into Zip
-      # EXE এবং HTML ফাইলটিকে একটি জিপ ফাইলে প্যাক করা হচ্ছে
       run: |
         Compress-Archive -Path "RasBlockerPro.exe", "index.html" -DestinationPath "RasBlockerPro_App.zip"
 
