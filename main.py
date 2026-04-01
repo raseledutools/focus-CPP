@@ -6,6 +6,17 @@ import time
 import sys
 import pynput # কীবোর্ড মনিটর করার জন্য (pip install pynput)
 
+# ================= রিসোর্স পাথ হ্যান্ডেলার (Nuitka/PyInstaller এর জন্য) =================
+def get_resource_path(relative_path):
+    """ গেট অ্যাবসলুট পাথ টু রিসোর্স, যা ডেভলপমেন্ট এবং .exe মোড উভয় ক্ষেত্রেই কাজ করবে """
+    if hasattr(sys, '_MEIPASS'):
+        # PyInstaller মোড
+        return os.path.join(sys._MEIPASS, relative_path)
+    
+    # Nuitka বা সাধারণ রান মোড
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base_path, relative_path)
+
 # ================= গ্লোবাল স্টেট =================
 is_strict_session = False
 is_halal_guard_on = True
@@ -36,6 +47,7 @@ class Api:
     def apply_hybrid_block(self):
         hosts_path = r"C:\Windows\System32\drivers\etc\hosts"
         redirect = "127.0.0.1"
+        # আপনার লিস্ট অনুযায়ী সাইটগুলো
         sites = ["facebook.com", "www.facebook.com", "youtube.com", "instagram.com", "tiktok.com"]
         
         try:
@@ -70,14 +82,14 @@ def on_press(key):
         if hasattr(key, 'char') and key.char:
             current_typed += key.char.upper()
             
-            # এডাল্ট কি-ওয়ার্ড চেক
+            # এডাল্ট কি-ওয়ার্ড চেক
             for word in bad_words:
                 if word in current_typed:
                     trigger_halal_screen()
                     current_typed = ""
                     break
         
-        # বাফার বেশি বড় হলে ছোট করা
+        # বাফার বেশি বড় হলে ছোট করা
         if len(current_typed) > 20:
             current_typed = current_typed[-10:]
             
@@ -97,8 +109,9 @@ def trigger_halal_screen():
         <p style="margin-top:40px; color:red; font-weight:bold;">UNSAFE KEYWORD DETECTED. RETURN TO WORK.</p>
     </div>`;
     """
-    window.evaluate_js(hadith_js)
-    window.maximize()
+    if 'window' in globals():
+        window.evaluate_js(hadith_js)
+        window.maximize()
 
 # ================= মেইন রানার =================
 
@@ -117,9 +130,12 @@ if __name__ == '__main__':
 
     # ৩. উইন্ডো তৈরি
     api = Api()
+    # Nuitka/EXE এর জন্য index.html এর সঠিক পাথ বের করা
+    html_file_path = get_resource_path('index.html')
+    
     window = webview.create_window(
         'RasBlocker Pro', 
-        'index.html', 
+        html_file_path, 
         js_api=api, 
         width=1050, 
         height=700,
