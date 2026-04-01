@@ -13,9 +13,7 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Download webview.h (Single Header Version)
-      run: curl -L -o webview.h https://raw.githubusercontent.com/webview/webview/0.10.0/webview.h
-
+    
     - name: Setup Official MSYS2 (C++ Compiler)
       uses: msys2/setup-msys2@v2  # একদম অফিসিয়াল এবং লেটেস্ট টুল
       with:
