@@ -14,13 +14,11 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Download webview.h (Single Header Version)
-      # এই ধাপটি কম্পাইল করার আগেই সঠিক লাইব্রেরিটি গিটহাবে নামিয়ে নেবে
       run: curl -L -o webview.h https://raw.githubusercontent.com/webview/webview/0.10.0/webview.h
 
-    - name: Setup MinGW (C++ Compiler)
-      uses: egor-tensin/setup-gcc@v1
+    - name: Setup MinGW (C++ Compiler for Windows)
+      uses: egor-tensin/setup-mingw@v2 # এখানেই পরিবর্তনটা করা হয়েছে
       with:
-        version: latest
         platform: x64
 
     - name: Compile C++ Code
