@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RasBlocker Pro - Ultimate Focus</title>
+    
+    <style>
+        :root {
+            --primary: #3B82F6; --primary-hover: #2563EB;
+            --danger: #EF4444; --danger-hover: #DC2626;
+            --success: #10B981; --warning: #F59E0B;
+            --bg-body: #F8FAFC; --bg-surface: #FFFFFF;
+            --text-dark: #1E293B; --text-muted: #64748B;
+            --border: #E2E8F0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; user-select: none; }
+        body { background-color: var(--bg-body); color: var(--text-dark); display: flex; height: 100vh; overflow: hidden; }
+
+        /* Typography & Utilities */
+        .text-xs { font-size: 0.75rem; } .text-sm { font-size: 0.875rem; } .text-base { font-size: 1rem; }
+        .text-lg { font-size: 1.125rem; } .text-xl { font-size: 1.25rem; } .text-2xl { font-size: 1.5rem; }
+        .font-semibold { font-weight: 600; } .font-bold { font-weight: 700; }
+        .flex { display: flex; } .items-center { align-items: center; } .justify-between { justify-content: space-between; } .justify-center { justify-content: center; }
+        .gap-2 { gap: 0.5rem; } .gap-4 { gap: 1rem; }
+        .p-4 { padding: 1rem; } .p-6 { padding: 1.5rem; } .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; } .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .rounded { border-radius: 0.25rem; } .rounded-lg { border-radius: 0.5rem; } .rounded-full { border-radius: 9999px; }
+        .shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .cursor-pointer { cursor: pointer; } .transition { transition: all 0.2s; }
+        .hidden { display: none !important; }
+
+        /* Layout */
+        .sidebar { width: 260px; background: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
+        .main-content { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .header { height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; }
+        .content-area { padding: 0 40px 40px 40px; flex: 1; overflow-y: auto; }
+
+        /* Sidebar Navigation */
+        .logo-area { height: 64px; background: var(--primary); color: white; display: flex; align-items: center; padding: 0 24px; font-size: 1.25rem; font-weight: bold; }
+        .nav-item { display: flex; align-items: center; gap: 16px; padding: 14px 24px; color: var(--text-muted); font-weight: 600; cursor: pointer; border-radius: 0 9999px 9999px 0; margin-right: 16px; transition: 0.2s; }
+        .nav-item:hover { background: #EFF6FF; color: var(--primary); }
+        .nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3); }
+        .nav-icon { width: 20px; height: 20px; fill: currentColor; }
+
+        /* Buttons */
+        .btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; display: flex; align-items: center; gap: 8px; font-size: 0.875rem; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-action-start { background: transparent; border: 1px solid var(--primary); color: var(--primary); border-radius: 9999px; padding: 6px 20px; }
+        .btn-action-start:hover { background: #EFF6FF; }
+        
+        /* Locked Button Style */
+        .btn-action-locked { background: #F1F5F9; border: 1px solid #CBD5E1; color: #94A3B8; border-radius: 9999px; padding: 6px 20px; cursor: not-allowed; }
+
+        /* Table */
+        .table-card { background: white; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); overflow: hidden; }
+        .table-header { display: grid; grid-template-columns: 3fr 3fr 2fr 2fr 2fr; padding: 16px; background: #F8FAFC; border-bottom: 1px solid var(--border); font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .table-row { display: grid; grid-template-columns: 3fr 3fr 2fr 2fr 2fr; padding: 20px 16px; border-bottom: 1px solid #F1F5F9; align-items: center; transition: 0.2s; }
+        .table-row:hover { background: #F8FAFC; }
+        
+        /* Badges & Progress */
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; color: white; }
+        .badge-red { background: var(--danger); } .badge-green { background: var(--success); } .badge-gray { background: var(--text-muted); }
+        .progress-bg { width: 100%; background: #E2E8F0; border-radius: 9999px; height: 6px; overflow: hidden; margin-top: 4px; }
+        .progress-fill { background: var(--primary); height: 100%; border-radius: 9999px; transition: width 0.5s ease; }
+
+        /* Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 50; }
+        .modal-content { background: white; width: 100%; max-width: 600px; border-radius: 12px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .modal-header { background: var(--primary); color: white; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 1.25rem; }
+        .modal-body { padding: 24px; max-height: 70vh; overflow-y: auto; }
+        .modal-footer { padding: 16px 24px; background: #F8FAFC; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; }
+
+        /* Form Elements */
+        .input-group { margin-bottom: 20px; }
+        .input-label { display: block; font-size: 0.875rem; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
+        .radio-card { border: 2px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; cursor: pointer; transition: 0.2s; }
+        input[type="radio"]:checked + .radio-card { border-color: var(--primary); background: #EFF6FF; }
+        .form-input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; outline: none; }
+        .form-input:focus { border-color: var(--primary); }
+
+        /* SVGs */
+        svg { display: inline-block; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <svg class="nav-icon" style="margin-right: 12px;" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+            RasBlocker Pro
+        </div>
+        
+        <div style="margin-top: 24px;">
+            <div class="nav-item active" onclick="switchTab('plans', this)">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+                Profiles & Plans
+            </div>
+            <div class="nav-item" onclick="switchTab('uninstall', this)">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                Uninstall Protection
+            </div>
+            <div class="nav-item" onclick="alert('Statistics module will be loaded by C++')">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20h4V4h-4v16zm-6 0h4v-8H4v8zM16 9v11h4V9h-4z"/></svg>
+                Statistics
+            </div>
+            <div class="nav-item" onclick="alert('Settings module will be loaded by C++')">
+                <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.3-.06.62-.06.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                Settings
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        
+        <div id="section-plans" style="display: flex; flex-direction: column; height: 100%;">
+            <div class="header">
+                <h1 class="text-2xl font-bold">Manage Your Profiles</h1>
+                <div class="flex gap-4">
+                    <button class="btn btn-primary" onclick="openModal()">
+                        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                        Create Profile
+                    </button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="table-card">
+                    <div class="table-header">
+                        <div>Profile Name</div>
+                        <div>Features</div>
+                        <div>Mode</div>
+                        <div>Schedule / Status</div>
+                        <div style="text-align: center;">Action</div>
+                    </div>
+
+                    <div class="table-row">
+                        <div class="font-bold">Hybrid Study Mode</div>
+                        <div class="flex gap-2">
+                            <span class="badge badge-gray">13 Blocked</span>
+                            <span class="badge badge-gray">Adult Filter</span>
+                        </div>
+                        <div class="text-sm font-semibold" style="color: var(--text-muted);">Hybrid Block</div>
+                        <div>
+                            <div class="text-xs font-bold" style="color: var(--text-muted); margin-bottom: 4px;">Not Running</div>
+                            <div class="progress-bg"><div class="progress-fill" style="width: 0%; background: var(--text-muted);"></div></div>
+                        </div>
+                        <div class="flex justify-center">
+                            <button class="btn btn-action-start" onclick="lockPlan(this, 'hybrid')">Start</button>
+                        </div>
+                    </div>
+
+                    <div class="table-row">
+                        <div class="font-bold">Deep Work Session</div>
+                        <div class="flex gap-2">
+                            <span class="badge badge-gray">Full Screen</span>
+                            <span class="badge badge-gray">No TaskMgr</span>
+                        </div>
+                        <div class="text-sm font-semibold" style="color: var(--text-muted);">Full Focus</div>
+                        <div>
+                            <div class="text-xs font-bold" style="color: var(--text-muted); margin-bottom: 4px;">Not Running</div>
+                            <div class="progress-bg"><div class="progress-fill" style="width: 0%; background: var(--text-muted);"></div></div>
+                        </div>
+                        <div class="flex justify-center">
+                            <button class="btn btn-action-start" onclick="lockPlan(this, 'full')">Start</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-uninstall" class="hidden" style="flex-direction: column; height: 100%;">
+            <div class="header">
+                <h1 class="text-2xl font-bold">Uninstall Protection</h1>
+            </div>
+            <div class="content-area">
+                <div style="background: white; padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 600px;">
+                    <p style="margin-bottom: 20px; color: var(--text-muted); font-size: 0.9rem;">Prevent yourself from uninstalling the app during an active session. Choose how you want to protect the uninstaller.</p>
+                    
+                    <div class="flex gap-4" style="margin-bottom: 24px;">
+                        <label style="flex: 1;">
+                            <input type="radio" name="uninstControl" value="self" style="display: none;" checked onchange="toggleUninstUI()">
+                            <div class="radio-card">
+                                <div style="font-size: 24px; margin-bottom: 8px;">👤</div>
+                                <div class="font-bold">Self Control</div>
+                                <div class="text-xs" style="color: var(--text-muted); margin-top: 4px;">Lock with a simple math problem or typing test.</div>
+                            </div>
+                        </label>
+                        <label style="flex: 1;">
+                            <input type="radio" name="uninstControl" value="friend" style="display: none;" onchange="toggleUninstUI()">
+                            <div class="radio-card">
+                                <div style="font-size: 24px; margin-bottom: 8px;">👥</div>
+                                <div class="font-bold">Friend Control</div>
+                                <div class="text-xs" style="color: var(--text-muted); margin-top: 4px;">Require a secret password known only to a friend.</div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div id="uninstFriendInput" class="hidden input-group">
+                        <label class="input-label">Set Uninstallation Password</label>
+                        <input type="password" class="form-input" placeholder="Friend's Password">
+                        <p style="color: var(--danger); font-size: 0.75rem; margin-top: 8px;">Warning: If you forget this, you cannot uninstall the app!</p>
+                    </div>
+
+                    <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="alert('Protection settings saved to C++ Backend!')">Save Protection Settings</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-overlay" id="addModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                Create New Profile
+                <span style="cursor: pointer;" onclick="closeModal()">✕</span>
+            </div>
+            <div class="modal-body">
+                
+                <div class="input-group">
+                    <label class="input-label">1. Profile Name</label>
+                    <input type="text" class="form-input" placeholder="e.g. Exam Prep">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">2. Focus Mode</label>
+                    <select class="form-input">
+                        <option>Hybrid Mode (Custom Sites)</option>
+                        <option>Full Focus Mode (Full Screen)</option>
+                        <option>Internet Fasting (Offline)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">3. Control Type</label>
+                    <div class="flex gap-4">
+                        <label style="flex: 1;">
+                            <input type="radio" name="planControl" value="self" style="display: none;" checked onchange="togglePlanControlUI()">
+                            <div class="radio-card">Self (Timer)</div>
+                        </label>
+                        <label style="flex: 1;">
+                            <input type="radio" name="planControl" value="friend" style="display: none;" onchange="togglePlanControlUI()">
+                            <div class="radio-card">Friend (Password)</div>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="planSelfInput" class="input-group flex gap-4">
+                    <input type="number" class="form-input" placeholder="Hours">
+                    <input type="number" class="form-input" placeholder="Minutes">
+                </div>
+                
+                <div id="planFriendInput" class="input-group hidden">
+                    <input type="password" class="form-input" placeholder="Set Unlock Password">
+                </div>
+
+                <div style="background: #ECFDF5; border: 1px solid #A7F3D0; padding: 12px; border-radius: 8px;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-weight: bold; color: #065F46; cursor: pointer;">
+                        <input type="checkbox" checked> Enable Halal Guard (Global Keyboard Monitor)
+                    </label>
+                    <p style="font-size: 0.75rem; color: #047857; margin-top: 4px; margin-left: 20px;">Instantly shows a black screen with Hadith if adult keywords are typed anywhere.</p>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background: white; border: 1px solid var(--border);" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="savePlan()">Save Profile</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal Logic
+        const modal = document.getElementById('addModal');
+        function openModal() { modal.style.display = 'flex'; }
+        function closeModal() { modal.style.display = 'none'; }
+
+        // Tab Switching Logic
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            document.getElementById('section-plans').style.display = 'none';
+            document.getElementById('section-uninstall').style.display = 'none';
+            
+            if(tabId === 'plans') {
+                document.getElementById('section-plans').style.display = 'flex';
+            } else if(tabId === 'uninstall') {
+                document.getElementById('section-uninstall').style.display = 'flex';
+                document.getElementById('section-uninstall').classList.remove('hidden');
+            }
+        }
+
+        // Uninstall Protection UI Toggle
+        function toggleUninstUI() {
+            const isFriend = document.querySelector('input[name="uninstControl"]:checked').value === 'friend';
+            const friendInput = document.getElementById('uninstFriendInput');
+            if(isFriend) {
+                friendInput.style.display = 'block';
+                friendInput.classList.remove('hidden');
+            } else {
+                friendInput.style.display = 'none';
+            }
+        }
+
+        // Plan Control UI Toggle
+        function togglePlanControlUI() {
+            const isSelf = document.querySelector('input[name="planControl"]:checked').value === 'self';
+            document.getElementById('planSelfInput').style.display = isSelf ? 'flex' : 'none';
+            
+            const friendInput = document.getElementById('planFriendInput');
+            if(!isSelf) {
+                friendInput.style.display = 'block';
+                friendInput.classList.remove('hidden');
+            } else {
+                friendInput.style.display = 'none';
+            }
+        }
+
+        // UNBREAKABLE START LOGIC
+        function lockPlan(btn, planType) {
+            // Change button to Locked state
+            btn.innerHTML = 'Running <svg class="nav-icon" style="width:14px;height:14px;margin-left:4px;" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>';
+            btn.className = 'btn btn-action-locked';
+            btn.disabled = true; // Completely disables clicks
+            
+            // Update Row Visuals to Active & Locked State
+            let row = btn.closest('.table-row');
+            let badges = row.querySelectorAll('.badge');
+            badges.forEach(b => {
+                b.classList.remove('badge-gray');
+                b.classList.add('badge-red'); 
+            });
+            
+            let progressText = row.querySelector('.text-xs');
+            progressText.innerText = "Active (Locked - Cannot Stop)";
+            progressText.style.color = "var(--danger)";
+            
+            let progressBar = row.querySelector('.progress-fill');
+            progressBar.style.width = "100%";
+            progressBar.style.background = "var(--danger)";
+
+            // Notify User & Trigger Backend
+            alert("STRICT MODE ON: " + planType + " plan started.\nYou CANNOT stop this session until the timer runs out or the password is provided. Task Manager will be blocked by C++.");
+        }
+
+        function savePlan() {
+            alert("New profile saved!");
+            closeModal();
+        }
+    </script>
+</body>
+</html>
