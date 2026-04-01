@@ -1,4 +1,4 @@
-name: Build RasBlocker Pro
+name: Build RasBlocker Pro (Python Hybrid)
 
 on:
   push:
@@ -13,25 +13,23 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    
-    - name: Setup Official MSYS2 (C++ Compiler)
-      uses: msys2/setup-msys2@v2  # একদম অফিসিয়াল এবং লেটেস্ট টুল
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
       with:
-        msystem: MINGW64
-        install: mingw-w64-x86_64-gcc
+        python-version: '3.10'
 
-    - name: Compile C++ Code
-      shell: msys2 {0} # MSYS2 এনভায়রনমেন্টে রান করার জন্য
+    - name: Install Build Tools
       run: |
-        g++ main.cpp -o RasBlockerPro.exe -static -static-libgcc -static-libstdc++ -mwindows -ladvapi32 -lole32 -lshell32 -lshlwapi -luser32 -lversion -loleaut32
+        python -m pip install --upgrade pip
+        pip install pywebview pynput pyinstaller
 
-    - name: Package App into Zip
-      shell: powershell # জিপ করার জন্য উইন্ডোজের পাওয়ারশেল ব্যবহার
+    - name: Build Professional EXE
+      # এখানে --add-data "index.html;." কমান্ডটি আপনার গিটহাবের index.html-কে EXE-র ভেতরে ঢুকিয়ে দেবে
       run: |
-        Compress-Archive -Path "RasBlockerPro.exe", "index.html" -DestinationPath "RasBlockerPro_App.zip"
+        pyinstaller --noconfirm --onefile --windowed --add-data "index.html;." --name "RasBlockerPro" main.py
 
-    - name: Upload Final Artifact
+    - name: Upload Finished EXE
       uses: actions/upload-artifact@v4
       with:
-        name: RasBlockerPro-Release
-        path: RasBlockerPro_App.zip
+        name: RasBlockerPro-Standalone
+        path: dist/RasBlockerPro.exe
