@@ -1,4 +1,4 @@
-name: Build RasBlocker Pro (Nuitka High Speed)
+name: Build RasBlocker Pro (Nuitka Final)
 
 on:
   push:
@@ -22,15 +22,12 @@ jobs:
       run: |
         pip install pywebview pynput nuitka
 
-    - name: Build EXE with Nuitka
-      # --standalone: সব লাইব্রেরি ভেতরে নিয়ে নেবে
-      # --onefile: একটি মাত্র ফাইল বানাবে
-      # --windows-disable-console: পেছনের কালো উইন্ডো বন্ধ করবে
-      # --include-data-files: আপনার index.html-কে ভেতরে ঢুকিয়ে দেবে
+    - name: Build Super Fast EXE
+      # --assume-yes-for-downloads যোগ করা হয়েছে যাতে গিটহাব অটোমেটিক পারমিশন দেয়
       run: |
-        python -m nuitka --standalone --onefile --windows-disable-console --include-data-files=index.html=index.html --output-dir=build_out main.py
+        python -m nuitka --standalone --onefile --windows-disable-console --assume-yes-for-downloads --include-data-files=index.html=index.html --output-dir=build_out main.py
 
-    - name: Upload Fast EXE
+    - name: Upload Finished EXE
       uses: actions/upload-artifact@v4
       with:
         name: RasBlockerPro-Nuitka-Fast
