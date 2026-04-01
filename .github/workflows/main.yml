@@ -1,0 +1,25 @@
+name: Build RasBlocker Pro
+
+# কোড পুশ করলে বা ম্যানুয়ালি রান করালে কাজ করবে
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch: 
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - name: রিপোজিটরির কোড চেকআউট করা
+      uses: actions/checkout@v4
+
+    - name: C++ প্রিমিয়াম কোড কম্পাইল করা
+      run: |
+        g++ main.cpp -o RasBlockerPro.exe -static -luser32 -ladvapi32
+        
+    - name: তৈরি হওয়া প্রিমিয়াম .exe ফাইলটি আপলোড করা
+      uses: actions/upload-artifact@v4
+      with:
+        name: RasBlockerPro-App
+        path: RasBlockerPro.exe
