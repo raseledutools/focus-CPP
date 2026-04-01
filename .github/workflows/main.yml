@@ -1,4 +1,4 @@
-name: Build RasBlocker Pro (Python Hybrid)
+name: Build RasBlocker Pro (Nuitka High Speed)
 
 on:
   push:
@@ -18,18 +18,20 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Install Build Tools
+    - name: Install Dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install pywebview pynput pyinstaller
+        pip install pywebview pynput nuitka
 
-    - name: Build Professional EXE
-      # এখানে --add-data "index.html;." কমান্ডটি আপনার গিটহাবের index.html-কে EXE-র ভেতরে ঢুকিয়ে দেবে
+    - name: Build EXE with Nuitka
+      # --standalone: সব লাইব্রেরি ভেতরে নিয়ে নেবে
+      # --onefile: একটি মাত্র ফাইল বানাবে
+      # --windows-disable-console: পেছনের কালো উইন্ডো বন্ধ করবে
+      # --include-data-files: আপনার index.html-কে ভেতরে ঢুকিয়ে দেবে
       run: |
-        pyinstaller --noconfirm --onefile --windowed --add-data "index.html;." --name "RasBlockerPro" main.py
+        python -m nuitka --standalone --onefile --windows-disable-console --include-data-files=index.html=index.html --output-dir=build_out main.py
 
-    - name: Upload Finished EXE
+    - name: Upload Fast EXE
       uses: actions/upload-artifact@v4
       with:
-        name: RasBlockerPro-Standalone
-        path: dist/RasBlockerPro.exe
+        name: RasBlockerPro-Nuitka-Fast
+        path: build_out/main.exe
