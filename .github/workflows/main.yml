@@ -1,34 +1,32 @@
-name: Build RasBlocker Pro (Nuitka Final)
+name: Build RasFocus Pure CPP
 
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch: 
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout Repository
+    - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.3
 
-    - name: Install Dependencies
+    - name: Install WebView2 NuGet Package
       run: |
-        pip install pywebview pynput nuitka
+        nuget install Microsoft.Web.WebView2 -OutputDirectory packages
 
-    - name: Build Super Fast EXE
-      # --assume-yes-for-downloads যোগ করা হয়েছে যাতে গিটহাব অটোমেটিক পারমিশন দেয়
+    - name: Build Application
       run: |
-        python -m nuitka --standalone --onefile --windows-disable-console --assume-yes-for-downloads --include-data-files=index.html=index.html --output-dir=build_out main.py
+        msbuild RasFocus.sln /p:Configuration=Release /p:Platform=x64
 
-    - name: Upload Finished EXE
+    - name: Upload EXE
       uses: actions/upload-artifact@v4
       with:
-        name: RasBlockerPro-Nuitka-Fast
-        path: build_out/main.exe
+        name: RasFocus-Lite
+        path: x64/Release/RasFocus.exe
